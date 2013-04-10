@@ -1,0 +1,8 @@
+*.py[co]
+*.sw[po]
+*.egg-info
+.DS_Store
+*~
+*.mo
+*.db
+dist
