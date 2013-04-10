@@ -135,6 +135,8 @@ def loop(server=None, tick=3):
             result = res.json()
             if result['update']:
                 update(data, result['update'])
+        except SystemExit:
+            raise
         except:
             traceback.print_exc()
             time.sleep(backoff)
