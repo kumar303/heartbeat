@@ -8,7 +8,7 @@ Install::
     sudo apt-get update
     sudo apt-get install dstat python-pip
     cd heartbeat
-    sudo pip install -r requirements.txt
+    sudo pip install -r requirements/prod.txt
     sudo python setup.py develop
 
 Run::
