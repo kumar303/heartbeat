@@ -64,8 +64,10 @@ class Dstat:
         legend = self.whitespace.split(legend.strip())
         line = self.whitespace.split(line.strip())
         if len(legend) != len(line):
-            raise ValueError('Unexpected legend %r for line %r'
-                             % (legend, line))
+            # e.g. legend: ['cpu', 'process'], line: ['']
+            # Return an empty dict. TODO: Maybe log this?
+            line = [None for ln in legend]
+
         return dict(zip(legend, line))
 
 
