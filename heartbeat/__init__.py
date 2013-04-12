@@ -93,7 +93,7 @@ def daemonize(main, args=[], kw={},
 class Data(object):
 
     def __init__(self):
-        self.dir = os.path.expanduser('~/.raspi-vinyl')
+        self.dir = os.path.expanduser('~/.heartbeat')
         if not os.path.exists(self.dir):
             os.mkdir(self.dir)
 
