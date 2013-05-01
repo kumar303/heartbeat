@@ -12,6 +12,7 @@ import daemon
 import requests
 
 space = re.compile(r'[\t ]+')
+DATA_DIR = None  # set by options in main()
 
 
 class Dstat:
@@ -46,7 +47,8 @@ class Dstat:
                              stderr=subprocess.STDOUT)
         ret = p.wait()
         assert ret == 0
-        return self.parse([self._clean_line(ln) for ln in p.stdout.readlines()])
+        return self.parse([self._clean_line(ln)
+                           for ln in p.stdout.readlines()])
 
     def _clean_line(self, ln):
         return ln.strip().replace('\x1b[7l', '')
@@ -93,9 +95,11 @@ def daemonize(main, args=[], kw={},
 class Data(object):
 
     def __init__(self):
-        self.dir = os.path.expanduser('~/.heartbeat')
+        self.dir = DATA_DIR
+        if not self.dir:
+            raise EnvironmentError('DATA_DIR was empty')
         if not os.path.exists(self.dir):
-            os.mkdir(self.dir)
+            raise EnvironmentError('DATA_DIR %s does not exist' % self.dir)
 
     def get_id(self):
         if not os.path.exists(self.file('id.txt')):
@@ -159,6 +163,7 @@ def get_ip_addr():
 
 
 def main():
+    global DATA_DIR
     p = optparse.OptionParser(usage='%prog [options]')
     p.add_option('--id', help='Print device ID and exit. The ID may be blank.',
                  action='store_true')
@@ -172,7 +177,11 @@ def main():
                  default='http://10.0.1.15:5000')
     p.add_option('-t', '--tick', help='Seconds to sleep in the main loop',
                  type=int, default=10)
+    p.add_option('--data_dir', action='store', default='/etc/heartbeat',
+                 help='Custom data dir. This must be writable. '
+                      'Default: %default')
     (options, args) = p.parse_args()
+    DATA_DIR = options.data_dir
 
     if options.id:
         data = Data()
