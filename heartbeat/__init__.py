@@ -129,8 +129,10 @@ def loop(server=None, tick=3):
 
             dstat = Dstat()
             status = dstat.sample()
+            packet = {'status': status,
+                      'ip_addr': get_ip_addr()}
             res = requests.post('%s/heartbeat/%s' % (server, id),
-                                data=json.dumps(status),
+                                data=json.dumps(packet),
                                 headers={'content-type': 'application/json'})
             result = res.json()
             if result['update']:
@@ -141,6 +143,19 @@ def loop(server=None, tick=3):
             traceback.print_exc()
             time.sleep(backoff)
         time.sleep(tick)
+
+
+def get_ip_addr():
+    try:
+        ifc = subprocess.check_output('ifconfig wlan0', shell=True)
+    except subprocess.CalledProcessError:
+        traceback.print_exc()
+        return None
+    pat = re.compile(r'inet addr:([^\s]+)')
+    for line in ifc.split('\n'):
+        m = pat.search(line)
+        if m:
+            return m.groups()[0]
 
 
 def main():

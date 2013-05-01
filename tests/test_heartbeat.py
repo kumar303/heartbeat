@@ -1,5 +1,7 @@
+import subprocess
 import unittest
 
+import mock
 from nose.tools import eq_
 
 import heartbeat
@@ -67,3 +69,24 @@ usr sys idl wai hiq siq| read  writ| used  buff  cach  free| recv  send| 1m   5m
         eq_(data['average']['top-mem']['process'], '9492k')
 
         eq_(data['sample']['cpu']['usr'], '56')
+
+
+@mock.patch('heartbeat.subprocess.check_output')
+class TestIPAddr(unittest.TestCase):
+
+    def test_good(self, out):
+        out.return_value = '''\
+wlan0     Link encap:Ethernet  HWaddr e0:91:53:62:ac:0a
+          inet addr:10.0.1.22  Bcast:10.0.1.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:206316 errors:0 dropped:208633 overruns:0 frame:0
+          TX packets:239308 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:37438823 (35.7 MiB)  TX bytes:293610377 (280.0 MiB)
+'''
+        eq_(heartbeat.get_ip_addr(), '10.0.1.22')
+
+    def test_bad(self, out):
+        out.side_effect = subprocess.CalledProcessError(1, 'ifconfig',
+                                                        output='Device not found')
+        eq_(heartbeat.get_ip_addr(), None)

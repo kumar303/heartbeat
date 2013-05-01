@@ -3,6 +3,8 @@ A Raspberry Pi heartbeat
 
 This sends dstat pings from a Raspbery Pi box to a central server for analysis.
 
+This requires Python 2.7
+
 Install::
 
     sudo apt-get update
