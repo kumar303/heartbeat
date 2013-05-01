@@ -160,6 +160,8 @@ def get_ip_addr():
 
 def main():
     p = optparse.OptionParser(usage='%prog [options]')
+    p.add_option('--id', help='Print device ID and exit. The ID may be blank.',
+                 action='store_true')
     p.add_option('-d', '--daemon', help='Run as daemon.',
                  action='store_true')
     p.add_option('-p', '--pidfile', help='PID file path. Default: %default',
@@ -171,6 +173,11 @@ def main():
     p.add_option('-t', '--tick', help='Seconds to sleep in the main loop',
                  type=int, default=10)
     (options, args) = p.parse_args()
+
+    if options.id:
+        data = Data()
+        print data.get_id() or ''
+        return
 
     kw = dict(server=options.server, tick=options.tick)
     if options.daemon:
